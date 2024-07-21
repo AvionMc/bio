@@ -2911,88 +2911,325 @@ local Pointers = Library.Pointers
 local Utility = Library.Utility
 
 local window = Library:Window({
-    Name = "lunar.vip"
+    Name = "NiggerCheat"
 })
 
-local page = window:Page({
-    Name = "combat";
-    Icon = ""; -- insert tab icon here
+local combat_page = window:Page({
+    Name = "Combat",
+    Icon = "" -- insert tab icon here if needed
 })
 
-local left_section = page:Section({
-    Name = "Left Section";
-    Side = "Left"
+local misc_page = window:Page({
+    Name = "Misc",
+    Icon = "" -- insert tab icon here if needed
 })
 
-left_section:Toggle({
-    Name = "Toggle"; 
-    State = false; 
-    Flag = "Toggle_Flag";
-    Callback = function(Bool)
-        print(Bool)
-    end 
+local settings_page = window:Page({
+    Name = "Options",
+    Icon = "" -- insert tab icon here if needed
 })
 
-left_section:Keybind({
-    Flag = "Keybind";
-    Default = Enum.KeyCode.E;
-    Callback = function()
-        print("keybind pressed")
-    end 
-})
+local Sections = {
+    Combat = {
+        Main = combat_page:Section({Name = "Silent", Side = "Left"}),
+        Checks = combat_page:Section({Name = "Checks", Side = "Right"}),
+        OnHit = combat_page:Section({Name = "On Hit", Side = "Right"}),
+        AutoBuy = combat_page:Section({Name = "Auto Buy", Side = "Right"}),
+        Speed = combat_page:Section({Name = "CFrame Speed", Side = "Left"}),
+        World = combat_page:Section({Name = "World", Side = "Right"}),
+    }
+}
 
-left_section:Slider({
-    Name = "Slider", 
-    Min = 0, 
-    Max = 100,
-    Default = 10, 
-    Decimals = 1, 
-    Suffix = "°", 
-    Flag = "slider flag";
-    Callback = function(Int)
-        print("Slider set to" .. Int)
-    end 
-})
+-- Silent
+do
+    Sections.Combat.Main:Toggle({
+        Name = "Enabled",
+        Flag = "Silent/Enabled",
+        Default = NiggerCheat.Silent.Enabled,
+        Callback = function(Value)
+            NiggerCheat.Silent.Enabled = Value
+        end
+    })
 
-left_section:List({
-    Name = "Dropdown", 
-    Options = {"head", "hrp", "arms", "feet", "legs", "torso"}, 
-    Default = "hrp", 
-    Max = 1, 
-    Flag = "aim_assist_bone",
-    Callback = function(Option)
-        print("option:" .. Option)
-    end 
-})
+    Sections.Combat.Main:List({
+        Name = "Mode",
+        Flag = "SilentAim/Mode",
+        Options = { 'FOV', 'Target' },
+        Default = NiggerCheat.Silent.Type,
+        Callback = function(Value)
+            NiggerCheat.Silent.Type = Value
+        end
+    })
 
-left_section:Multibox({
-    Name = "Multi Dropdown", 
-    Options = {"1", "2", "3"},
-    Default = {"1"}, 
-    Max = 9e9, 
-    Flag = "dropdown flag",
-    Callback = function(Option)
-        table.foreach(Option, print)
-    end 
-})
+    Sections.Combat.Main:Toggle({
+        Name = "Allow Notifications",
+        Flag = "Silent/Notify",
+        Default = NiggerCheat.Silent.Notify,
+        Callback = function(Value)
+            NiggerCheat.Silent.Notify = Value
+        end
+    })
 
-left_section:Textbox({
-    Name = "Textbox", 
-    Flag = "aim_assist_prediction",
-    Placeholder = "Textbox placeholder text",
-    Callback = function(Text)
-        print(Text)
-    end
-})
+    Sections.Combat.Main:Toggle({
+        Name = "LookAt",
+        Flag = "Silent/LookAt",
+        Default = NiggerCheat.Silent.LookAt,
+        Callback = function(Value)
+            NiggerCheat.Silent.LookAt = Value
+        end
+    })
 
-left_section:Colorpicker({
-    Name = "Textbox", 
-    Flag = "color flag",
-    Alpha = 1,
-    Callback = function(Bool)
-        print(Bool)
-    end 
-})
+    Sections.Combat.Main:Toggle({
+        Name = "ViewAt",
+        Flag = "SilentAim/ViewAt",
+        Default = NiggerCheat.Silent.ViewAt,
+        Callback = function(Value)
+            NiggerCheat.Silent.ViewAt = Value
+        end
+    })
+
+    Sections.Combat.Main:Textbox({
+        Name = "Horizontal Prediction",
+        Flag = "CombatHorizontalPrediction",
+        Placeholder = "Horizontal Prediction Amount",
+        Callback = function(Value)
+            NiggerCheat.Silent.Prediction.Horizontal = tonumber(Value)
+        end
+    })
+
+    Sections.Combat.Main:Textbox({
+        Name = "Vertical Prediction",
+        Flag = "CombatVerticalPrediction",
+        Placeholder = "Vertical Prediction Amount",
+        Callback = function(Value)
+            NiggerCheat.Silent.Prediction.Vertical = tonumber(Value)
+        end
+    })
+
+    Sections.Combat.Main:Toggle({
+        Name = "Auto Prediction",
+        Flag = "Sections.Combat.Main/AutoPrediction",
+        Default = NiggerCheat.Silent.AutoPrediction.Enabled,
+        Callback = function(Value)
+            NiggerCheat.Silent.AutoPrediction.Enabled = Value
+        end
+    })
+
+    -- C-Sync
+    Sections.Combat.Main:Toggle({
+        Name = "C-Sync",
+        Flag = "CSyncAntiAimEnabled",
+        Default = false,
+        Callback = function(Value)
+            NiggerCheat.CSync.Enabled = Value
+        end
+    }):Keybind({
+        Flag = "CSyncAntiAimKeyPicker",
+        Default = "b",
+        Mode = "Toggle",
+    })
+
+    Sections.Combat.Main:List({
+        Name = "Type",
+        Flag = "CSyncAntiAimType",
+        Options = {"Custom", "Random", "Random Target", "Target Strafe", "Local Strafe", "Destroy Cheaters"},
+        Default = 1,
+        Callback = function(Value)
+            NiggerCheat.CSync.Type = Value
+        end
+    })
+end
+
+-- Checks
+do
+    Sections.Combat.Checks:Toggle({
+        Name = "Knocked",
+        Flag = "CombatChecksKnockedEnabled",
+        Default = false,
+        Callback = function(Value)
+            NiggerCheat.Checks.Silent.Knocked = Value
+        end
+    })
+
+    Sections.Combat.Checks:Toggle({
+        Name = "Wall",
+        Flag = "CombatChecksWallEnabled",
+        Default = false,
+        Callback = function(Value)
+            NiggerCheat.Checks.Silent.Wall = Value
+        end
+    })
+    
+    Sections.Combat.Checks:Toggle({
+        Name = "Visible",
+        Flag = "CombatChecksVisibleEnabled",
+        Default = false,
+        Callback = function(Value)
+            NiggerCheat.Checks.Silent.Visible = Value
+        end
+    })
+    
+    Sections.Combat.Checks:Toggle({
+        Name = "Friend",
+        Flag = "CombatChecksFriendEnabled",
+        Default = false,
+        Callback = function(Value)
+            NiggerCheat.Checks.Silent.Friend = Value
+        end
+    })
+
+    Sections.Combat.Checks:Toggle({
+        Name = "Crew",
+        Flag = "CombatChecksCrewEnabled",
+        Default = false,
+        Callback = function(Value)
+            NiggerCheat.Checks.Silent.Crew = Value
+        end
+    })
+end
+
+-- On Hit
+do
+    Sections.Combat.OnHit:Toggle({
+        Name = "Enabled",
+        Flag = "VisualsOnHitEnabled",
+        Default = false
+    })
+
+    Sections.Combat.OnHit:Toggle({
+        Name = "Effect",
+        Flag = "VisualsOnHitEffectEnabled",
+        Default = false
+    }):Colorpicker({
+        Flag = "VisualsOnHitEffectColor",
+        Default = Color3.new(1, 1, 1)
+    })
+    
+    Sections.Combat.OnHit:Toggle({
+        Name = "Logs",
+        Flag = "VisualsOnHitLogsEnabled",
+        Default = false
+    })
+    
+    Sections.Combat.OnHit:Toggle({
+        Name = "Sound",
+        Flag = "VisualsOnHiSoundEnabled",
+        Default = false
+    })
+
+    Sections.Combat.OnHit:Slider({
+        Name = "Sound Volume",
+        Flag = "VisualsOnHitSoundVolume",
+        Default = 5,
+        Min = 0.1,
+        Max = 10,
+        Decimals = 2
+    })
+
+    Sections.Combat.OnHit:List({
+        Name = "Sound To Play",
+        Flag = "VisualsOnHitSound",
+        Options = hitSoundsNames,
+        Default = 1
+    })
+
+    Sections.Combat.OnHit:Toggle({
+        Name = "Hit Chams",
+        Flag = "VisualsOnHitChamsEnabled",
+        Default = false,
+        Callback = function(Value)
+            NiggerCheat.Visuals.OnHit["Hit Chams"] = Value
+        end
+    }):Colorpicker({
+        Flag = "VisualsOnHitChamsColor",
+        Default = Color3.new(1, 1, 1),
+        Callback = function(Value)
+            NiggerCheat.Visuals.OnHit["Hit Chams Color"] = Value
+        end
+    })
+
+    Sections.Combat.OnHit:Slider({
+        Name = "Hit Chams Duration",
+        Flag = "VisualsOnHitChamsDuration",
+        Default = 1,
+        Min = 0.1,
+        Max = 10,
+        Decimals = 2,
+        Callback = function(Value)
+            NiggerCheat.Visuals.OnHit["Hit Chams Fading Time"] = Value
+        end
+    })
+
+    Sections.Combat.OnHit:List({
+        Name = "Hit Chams Material",
+        Flag = "VisualsOnHitChamsMaterial",
+        Options = {"ForceField", "Neon"},
+        Default = 1,
+        Callback = function(Value)
+            NiggerCheat.Visuals.OnHit["Hit Chams Material"] = Value
+        end
+    })
+end
+
+-- Auto Buy
+do
+    Sections.Combat.AutoBuy:Slider({
+        Name = "Multiplier",
+        Flag = "SigmaSkibidiToilet",
+        Default = 1,
+        Min = 0,
+        Max = 10,
+        Decimals = 3,
+        Callback = function(Value)
+            autobuymultiplier = Value
+        end
+    })
+
+    Sections.Combat.AutoBuy:List({
+        Name = "Guns",
+        Flag = "CombatSkibidiDropdown",
+        Options = Guns,
+        Default = 2,
+        Callback = function(Value)
+            selectedgun = Value
+        end
+    })
+    
+    Sections.Combat.AutoBuy:Button({
+        Name = "Buy Gun/Ammo",
+        Callback = function()
+            BuyGunAndAmmo(selectedgun, autobuymultiplier)
+        end
+    })
+end
+
+-- CFrame Speed
+do
+    Sections.Combat.Speed:Toggle({
+        Name = "Enabled",
+        Flag = "MiscCFrameSpeedEnabled",
+        Default = false,
+        Callback = function(Value)
+            NiggerCheat.Misc.Movement.Speed.Enabled = Value
+        end
+    }):Keybind({
+        Flag = "MiscCFrameSpeedKeybind",
+        Default = "b",
+        Mode = "Toggle",
+    })
+
+    Sections.Combat.Speed:Slider({
+        Name = "Amount",
+        Flag = "MiscCFrameSpeedAmount",
+        Default = 0.1,
+        Min = 0,
+        Max = 10,
+        Decimals = 3,
+        Callback = function(Value)
+            NiggerCheat.Misc.Movement.Speed.Amount = Value
+        end
+    })
+end
 
 -- ignore this is config page :^)
 do -- Settings
